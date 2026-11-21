@@ -9,7 +9,7 @@ pip install -r requirements.txt
 ### Compare the baseline and the improved solver on attention
 
 ```sh
-python baseline_solver.py
+python comparison.py
 ```
 
 ### Improved Greedy solver
