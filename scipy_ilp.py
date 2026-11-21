@@ -124,6 +124,12 @@ def score(nodes, edges, choices, l_out, l_init, l_max):
 
 
 def bootstrap_counts(nodes, edges, choices):
+    """Count per-ciphertext Bootstrap1/Bootstrap2 operations in a solution.
+
+    A B1 prefix on an edge is charged to its producer once; a B2 prefix is
+    charged half the producer's ciphertext count.  ``choices[i]`` is the chain
+    string for ``edges[i]`` returned by :func:`solve_scipy`.
+    """
     names, n_ct = topology(nodes, edges)
     b1 = {u for u in names if any("B1" in choices[i]
                                   for i, (a, b, c) in enumerate(edges) if a == u)}
@@ -161,6 +167,7 @@ def solve_scipy(nodes, edges, l_init, l_max=14, time_limit=600):
     c, lb, ub, integrality = [], [], [], []
 
     def new_var(cost=0.0, high=1.0):
+        """Append one integer variable and return its column index."""
         idx = len(c)
         c.append(cost); lb.append(0.0); ub.append(high); integrality.append(1)
         return idx
@@ -190,6 +197,7 @@ def solve_scipy(nodes, edges, l_init, l_max=14, time_limit=600):
     rows, lows, highs = [], [], []
 
     def add(coeff, low=-np.inf, high=np.inf):
+        """Append one linear constraint given a {variable: coefficient} dict."""
         rows.append(coeff); lows.append(low); highs.append(high)
 
     # Chain prefix, target level and sharing of bootstrap prefixes.
@@ -251,10 +259,12 @@ def solve_scipy(nodes, edges, l_init, l_max=14, time_limit=600):
 #  Experiment
 # --------------------------------------------------------------------------- #
 def cases():
+    """Return the six (L_init, L_max) cases used in Table 1 of the report."""
     return [(li, lm) for li in (1, 2) for lm in (14, 15, 16)]
 
 
 def compare():
+    """Print the four-way comparison table (Orbit / SciPy / greedy / baseline)."""
     from orbit_ilp import solve_orbit
 
     print(f"{'L_init':>6} {'L_max':>6} {'Orbit':>14} {'SciPy':>14} "
@@ -272,6 +282,7 @@ def compare():
 
 
 def main():
+    """Parse CLI arguments and run either the comparison or the six ILP cases."""
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--compare", action="store_true",
                     help="compare Orbit / SciPy / greedy / baseline")

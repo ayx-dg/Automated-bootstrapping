@@ -31,6 +31,7 @@ def solve_orbit(nodes, edges, l_init, l_max=14, time_limit=600):
     c, lb, ub, integrality = [], [], [], []
 
     def new_var(cost=0.0, high=1.0):
+        """Append one integer variable and return its column index."""
         idx = len(c)
         c.append(cost); lb.append(0.0); ub.append(high); integrality.append(1)
         return idx
@@ -61,6 +62,7 @@ def solve_orbit(nodes, edges, l_init, l_max=14, time_limit=600):
     rows, lows, highs = [], [], []
 
     def add(coeff, low=-np.inf, high=np.inf):
+        """Append one linear constraint given a {variable: coefficient} dict."""
         rows.append(coeff); lows.append(low); highs.append(high)
 
     # Vertex levels and the fan-in minimum.
@@ -129,10 +131,12 @@ def solve_orbit(nodes, edges, l_init, l_max=14, time_limit=600):
 
 
 def cases():
+    """Return the six (L_init, L_max) cases used in Table 1 of the report."""
     return [(li, lm) for li in (1, 2) for lm in (14, 15, 16)]
 
 
 def main():
+    """Parse CLI arguments and solve the requested case(s) with the dense ILP."""
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--l-init", type=int, default=None)
     ap.add_argument("--l-max", type=int, default=14)
